@@ -22,4 +22,4 @@ certs/
 *.log
 
 # Environment variables
-.env
+.envcerts/solace-server-chain.crt
