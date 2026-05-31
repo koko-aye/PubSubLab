@@ -400,7 +400,6 @@ Expected:
 
 ```text
 solace-server-chain.crt
-sol-ca-bundle.crt
 ```
 
 Regenerate certificates if necessary.
