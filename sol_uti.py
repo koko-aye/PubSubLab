@@ -4,9 +4,54 @@ from solace.messaging.resources.topic import Topic
 from solace.messaging.resources.topic_subscription import TopicSubscription
 from time import sleep
 from solace.messaging.receiver.message_receiver import MessageHandler
-    
+from solace.messaging.messaging_service import (
+    ReconnectionListener,
+    ReconnectionAttemptListener,
+    ServiceInterruptionListener,
+)
+import base_uti
 
-def get_connection(host, vpn_name, username, password):
+max_retries = 20
+retry_interval = 10 
+current_retry_count = 0
+
+class MyReconnectionAttemptListener(ReconnectionAttemptListener):
+    def __init__(self, callback=None):
+        self.callback = callback
+
+    def on_reconnecting(self, event):
+        print("Solace reconnecting...")
+        print(event)
+
+        if self.callback:
+            self.callback(event)
+
+
+class MyReconnectionListener(ReconnectionListener):
+    def __init__(self, callback=None):
+        self.callback = callback
+
+    def on_reconnected(self, event):
+        print("Solace reconnected successfully")
+        print(event)
+
+        if self.callback:
+            self.callback(event)
+
+
+class MyServiceInterruptionListener(ServiceInterruptionListener):
+    def __init__(self, callback=None):
+        self.callback = callback
+
+    def on_service_interrupted(self, event):
+        print("Solace service interrupted")
+        print(event)
+
+        if self.callback:
+            self.callback(event)
+
+
+def get_connection(host, vpn_name, username, password, on_reconnecting_callback, reconnected_callback, svc_interruption_callback):
 
     broker_props = {
         "solace.messaging.transport.host":
@@ -32,9 +77,20 @@ def get_connection(host, vpn_name, username, password):
         MessagingService.builder()
         .from_properties(broker_props)
         .with_reconnection_retry_strategy(
-            RetryStrategy.parametrized_retry(20, 3)
+            RetryStrategy.parametrized_retry(max_retries, retry_interval)
         )
         .build()
+    )
+    messaging_service.add_reconnection_attempt_listener(
+        MyReconnectionAttemptListener(on_reconnecting_callback)
+    )
+
+    messaging_service.add_service_interruption_listener(
+        MyServiceInterruptionListener(svc_interruption_callback)
+    )
+
+    messaging_service.add_reconnection_listener(
+        MyReconnectionListener(reconnected_callback)
     )
 
     messaging_service.connect()
@@ -60,22 +116,14 @@ def publish_message(messaging_service, topic, message):
         destination=Topic.of(topic),
         message=message
     )
-    print(f"Message published to topic: {message}")
-
+    print(f"{base_uti.get_singapore_datetime()} - Message published to topic: {topic}")
 
 def start_topic_subscriber(messaging_service, topic, callback, stop_event):
 
     class MessageProcessor(MessageHandler):
 
         def on_message(self, message):
-
-            # payload = message.get_payload_as_string()
-
-            # print("Received:", payload)
-
-            # Send payload back to UI callback
             callback(message)
-
     receiver = (
         messaging_service
         .create_direct_message_receiver_builder()
@@ -85,6 +133,7 @@ def start_topic_subscriber(messaging_service, topic, callback, stop_event):
         .build()
     )
 
+    
     receiver.start()
 
     receiver.receive_async(MessageProcessor())
@@ -97,19 +146,17 @@ def start_topic_subscriber(messaging_service, topic, callback, stop_event):
     
     receiver.terminate()
 
-
 def start_queue_subscriber(messaging_service, queue_name, callback, stop_event):
 
     class MessageProcessor(MessageHandler):
 
         def on_message(self, message):
+            try:
+                callback(message)
+                receiver.ack(message)
+            except Exception as e:
+                print("Processing failed:", e)
 
-            payload = message.get_payload_as_string()
-
-            print("Received:", payload)
-
-            # Send payload back to UI callback
-            callback(payload)
     queue = Queue.durable_exclusive_queue(queue_name)
     receiver = (
         messaging_service.create_persistent_message_receiver_builder()

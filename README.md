@@ -19,25 +19,74 @@ The project includes utilities for:
 
 Before starting, ensure you have:
 
-* Python 3.10 or later
-* GitHub Codespaces or Linux environment
-* A Solace Cloud account
-* Internet access to connect to Solace Cloud
+* Python 3.12 or later
+* GitHub account
+* GitHub Codespaces access
+* Solace Cloud account
+* Internet access
 
 ---
 
 # Project Setup
 
-## 1. Clone Repository
+## 1. Fork Repository
 
-```bash
-git clone <repository-url>
-cd <repository-name>
+Open the repository:
+
+```text
+https://github.com/koko-aye/PubSubLab
+```
+
+Click **Fork**.
+
+Select your GitHub account.
+
+Click **Create Fork**.
+
+Example:
+
+```text
+Original Repository:
+https://github.com/koko-aye/PubSubLab
+
+↓
+
+Fork
+
+↓
+
+https://github.com/<your-github-id>/PubSubLab
 ```
 
 ---
 
-## 2. Create Python Virtual Environment
+## 2. Create GitHub Codespace
+
+1. Open your forked repository.
+2. Click **Code**.
+3. Select the **Codespaces** tab.
+4. Click **Create codespace on main**.
+5. Wait for the Codespace environment to start.
+6. Once VS Code opens in the browser, open a Terminal.
+
+Verify the workspace:
+
+```bash
+pwd
+ls -l
+```
+
+Expected:
+
+```text
+/workspaces/PubSubLab
+```
+
+---
+
+## 3. Create Python Virtual Environment
+
+Create a virtual environment:
 
 ```bash
 python3 -m venv venv
@@ -45,12 +94,18 @@ python3 -m venv venv
 
 ---
 
-## 3. Activate Virtual Environment
+## 4. Activate Virtual Environment
 
 Linux / GitHub Codespaces:
 
 ```bash
 source venv/bin/activate
+```
+
+Expected:
+
+```text
+(venv) codespace ➜ /workspaces/PubSubLab $
 ```
 
 Windows PowerShell:
@@ -67,16 +122,46 @@ venv\Scripts\activate.bat
 
 ---
 
-## 4. Install Dependencies
+## 5. Install Dependencies
+
+Install required packages:
 
 ```bash
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 Verify installation:
 
 ```bash
 pip list
+```
+
+---
+
+## 6. Verify Python Version
+
+```bash
+python3 --version
+```
+
+Expected:
+
+```text
+Python 3.12.x
+```
+
+---
+
+## 7. Verify Internet Connectivity
+
+```bash
+curl https://www.google.com
+```
+
+or
+
+```bash
+ping google.com
 ```
 
 ---
@@ -119,6 +204,9 @@ solace-cloud-client
 
 Password:
 xxxxxxxxxxxxxxxx
+
+Secure Port:
+55443
 ```
 
 ---
@@ -230,8 +318,6 @@ Press ENTER
 
 # Test Queue Subscription
 
-Subscribe to a queue.
-
 Ensure the queue exists in Solace Cloud before testing.
 
 ```bash
@@ -254,57 +340,6 @@ Press ENTER to stop subscribing...
 
 ---
 
-# Command Reference
-
-## Connection Test
-
-```bash
-python testClient.py \
-  --action connect \
-  --host <broker-host> \
-  --vpn <vpn-name> \
-  --username <username> \
-  --password <password>
-```
-
-## Publish Message
-
-```bash
-python testClient.py \
-  --action pub \
-  --host <broker-host> \
-  --vpn <vpn-name> \
-  --username <username> \
-  --password <password> \
-  --topic <topic-name>
-```
-
-## Subscribe to Topic
-
-```bash
-python testClient.py \
-  --action subOnTopic \
-  --host <broker-host> \
-  --vpn <vpn-name> \
-  --username <username> \
-  --password <password> \
-  --topic <topic-name>
-```
-
-## Subscribe to Queue
-
-```bash
-python testClient.py \
-  --action subOnQueue \
-  --host <broker-host> \
-  --vpn <vpn-name> \
-  --username <username> \
-  --password <password> \
-  --queue <queue-name>
-```
-
----
-
 # Project Structure
 
 ```text
@@ -313,11 +348,12 @@ python testClient.py \
 ├── sol_uti.py
 ├── createServerCert.py
 ├── testClient.py
-├── requirement.txt
+├── requirements.txt
 ├── README.md
-└── certs/
-    ├── solace-server-chain.crt
-    └── sol-ca-bundle.crt
+├── certs/
+│   ├── solace-server-chain.crt
+│   └── sol-ca-bundle.crt
+└── venv/
 ```
 
 ---
@@ -375,10 +411,31 @@ Regenerate certificates if necessary.
 
 Verify:
 
-* VPN name
+* VPN Name
 * Username
 * Password
-* Client profile permissions
+* Client Profile permissions
+
+---
+
+## Tkinter Error in GitHub Codespaces
+
+Error:
+
+```text
+_tkinter.TclError: no display name and no $DISPLAY environment variable
+```
+
+Cause:
+
+GitHub Codespaces is a headless Linux environment and does not support desktop GUI applications.
+
+Recommended alternatives:
+
+* FastAPI
+* Flask
+* Streamlit
+* Gradio
 
 ---
 
@@ -413,5 +470,4 @@ Do not commit:
 ---
 
 # License
-
 Internal training and development use only.
