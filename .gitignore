@@ -1,20 +1,24 @@
-# Python virtual environment
+# Virtual env
 .venv/
 venv/
+
+# Python
+__pycache__/
+*.pyc
 
 # VS Code
 .vscode/
 
-# Python cache
-__pycache__/
-*.pyc
-
-# Certificates
+# Certificates and secrets
 certs/
+*.pem
+*.crt
+*.key
+*.p12
+*.jks
 
 # Logs
-logs/
+*.log
 
-# Build output
-dist/
-build/
+# Environment variables
+.env
