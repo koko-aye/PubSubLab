@@ -232,7 +232,6 @@ Generated files:
 ```text
 certs/
 ├── solace-server-chain.crt
-└── sol-ca-bundle.crt
 ```
 
 ---
@@ -352,7 +351,6 @@ Press ENTER to stop subscribing...
 ├── README.md
 ├── certs/
 │   ├── solace-server-chain.crt
-│   └── sol-ca-bundle.crt
 └── venv/
 ```
 
@@ -414,27 +412,6 @@ Verify:
 * Username
 * Password
 * Client Profile permissions
-
----
-
-## Tkinter Error in GitHub Codespaces
-
-Error:
-
-```text
-_tkinter.TclError: no display name and no $DISPLAY environment variable
-```
-
-Cause:
-
-GitHub Codespaces is a headless Linux environment and does not support desktop GUI applications.
-
-Recommended alternatives:
-
-* FastAPI
-* Flask
-* Streamlit
-* Gradio
 
 ---
 
